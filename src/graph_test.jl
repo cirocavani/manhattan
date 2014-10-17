@@ -118,6 +118,7 @@ function testmincostdata_cyclecanceling()
     for f in readdir(folder)
         endswith(f, ".net") || continue
         !beginswith(f, "big") || continue
+        !beginswith(f, "cap") || continue
         path = "data/$f"
         print("Processing $path... ")
         g = netg(path)
