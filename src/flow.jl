@@ -6,25 +6,37 @@ type PathNode
     reverse::Bool
     edge::Edge
     
-    PathNode(e::Edge) = (p = new(); (p.length, p.reverse, p.edge) = (0, false, e); p)
+    PathNode(e::Edge,r=false) = (p = new(); (p.length, p.reverse, p.edge) = (0, r, e); p)
     PathNode(p::PathNode, r::Bool, e::Edge) = new(p, p.length + 1, r, e)
 end
 
 head(p::PathNode) = p.reverse ? p.edge.tail : p.edge.head
-Base.start(p::PathNode) = p
-Base.done(p::PathNode, i::PathNode) = !isdefined(i, :parent)
-Base.next(p::PathNode, i::PathNode) = (i, i.parent)
-path(p::PathNode) = begin
-    result = Array(Edge, p.length)
-    for i in p
-        result[i.length] = i.edge
+tail(p::PathNode) = p.reverse ? p.edge.head : p.edge.tail
+flow(p::PathNode) = p.reverse ? (p.edge.cap - p.edge.flow) : p.edge.flow
+free(p::PathNode) = p.reverse ? p.edge.flow : (p.edge.cap - p.edge.flow)
+cap(p::PathNode) = p.edge.cap
+cost(p::PathNode) = p.reverse ? -p.edge.cost : p.edge.cost
+
+Base.show(io::IO, p::PathNode) = print(io,"($(tail(p)))-[$(flow(p)),$(cap(p)),$(cost(p))]->($(head(p))), reverse=$(p.reverse)")
+
+path(leaf::PathNode) = begin
+    p = Array(PathNode, leaf.length)
+    i = leaf
+    while isdefined(i, :parent)
+        p[i.length] = PathNode(i.edge, i.reverse) # inverse root distance
+        i = i.parent
     end
-    result
+    p
 end
-    
+
+function availableflow(p::Array{PathNode,1})
+    minimum([free(i) for i in p])
+end
+
 function residualpath(g::Graph, s::Vertex, t::Vertex)
+    flow(s) > 0 || return nothing
     nodes = Queue(PathNode)
-    mark = zeros(Bool,order(g))
+    mark = falses(order(g))
     
     enqueue!(nodes, PathNode(Edge(Vertex(0),s,0,0,0,0)))
     mark[s.id] = true
@@ -55,43 +67,17 @@ function residualpath(g::Graph, s::Vertex, t::Vertex)
             mark[e.tail.id] = true
         end
     end
-
     nothing
 end
 
-function residualdelta(path::Array{Edge,1})
-    delta = 0
-    v = indegree(path[1].tail) == 0 ? path[1].tail : path[1].head
-    for e in path
-        m = 0
-        if is(e.tail, v)
-            m = e.cap - e.flow
-            v = e.head
-        elseif is(e.head, v)
-            m = e.flow
-            v = e.tail
-        else
-            error("Invalid path!")
-        end
-        if delta == 0 || delta > m
-            delta = m
-        end
-    end
-    delta
+function residualdelta(p::Array{PathNode,1})
+    v = tail(p[1])
+    min(flow(v), availableflow(p))
 end
 
-function updateflow!(path::Array{Edge,1}, delta::Int)
-    v = indegree(path[1].tail) == 0 ? path[1].tail : path[1].head
-    for e in path
-        if is(e.tail, v)
-            e.flow += delta
-            v = e.head
-        elseif is(e.head, v)
-            e.flow -= delta
-            v = e.tail
-        else
-            error("Invalid path!")
-        end
+function updateflow!(path::Array{PathNode,1}, delta::Int)
+    for p in path
+        p.edge.flow += p.reverse ? -delta : delta
     end
     nothing
 end
@@ -105,6 +91,26 @@ function maxflow!(g::Graph)
         end
         delta = residualdelta(path)
         updateflow!(path, delta)
+    end
+    g
+end
+
+function maxflow_castst!(g::Graph)
+    makest!(g)
+    maxflow!(g)
+    resetst!(g)
+    g
+end
+
+function mincost_cyclecanceling!(g::Graph)
+    isfeasibleflow(g) || error("missing flow")
+    while true
+        cycle = negativecycle(g)
+        if cycle == nothing
+            break
+        end
+        delta = availableflow(cycle)
+        updateflow!(cycle, delta)
     end
     g
 end

@@ -1,32 +1,17 @@
 function isbalanced(g::Graph)
-    sum = 0
-    for v in g.vertices
-        sum += v.flow
-    end
-    sum == 0
+    sum([v.flow for v in g.vertices]) == 0
 end
 
 function hasconservation(g::Graph)
     for v in g.vertices
-        sum = v.flow
-        for e in v.edgesIn
-            sum += e.flow
-        end
-        for e in v.edgesOut
-            sum -= e.flow
-        end
-        if sum != 0
-            return false
-        end
+        flow(v) == 0 || return false
     end
     true
 end
 
 function hasnonnegativecapacity(g::Graph)
     for e in g.edges
-        if e.cap < 0
-            return false
-        end
+        e.cap >= 0 || return false
     end
     true
 end
@@ -40,6 +25,14 @@ function issingleedge(g::Graph)
                 end
             end
         end
+    end
+    true
+end
+
+function isfeasibleflow(g::Graph)
+    hasconservation(g) || return false
+    for e in g.edges
+        e.flow >= e.low && e.flow <= e.cap || return false
     end
     true
 end

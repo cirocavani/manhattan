@@ -1,4 +1,3 @@
-import Base.show
 import Base.size
 
 type Vertex
@@ -11,8 +10,18 @@ end
 degree(v::Vertex) = length(v.edgesIn) + length(v.edgesOut)
 outdegree(v::Vertex) = length(v.edgesOut)
 indegree(v::Vertex) = length(v.edgesIn)
+flow(v::Vertex) = begin
+    m = v.flow
+    if !isempty(v.edgesIn)
+        m += sum([e.flow for e in v.edgesIn])
+    end
+    if !isempty(v.edgesOut)
+        m -= sum([e.flow for e in v.edgesOut])
+    end
+    m
+end
 
-show(io::IO, v::Vertex) = print(io,"$(v.id)")
+Base.show(io::IO, v::Vertex) = print(io,"$(v.id)")
 
 type Edge
     tail::Vertex
@@ -23,7 +32,7 @@ type Edge
     flow::Int
 end
 
-show(io::IO, e::Edge) = print(io,"($(e.tail))-[$(e.flow),$(e.cap),$(e.cost)]->($(e.head))")
+Base.show(io::IO, e::Edge) = print(io,"($(e.tail))-[$(e.flow),$(e.cap),$(e.cost)]->($(e.head))")
 
 type Graph
     vertices::Array{Vertex,1}
@@ -33,7 +42,7 @@ end
 order(g::Graph) = length(g.vertices)
 size(g::Graph) = length(g.edges)
 
-show(io::IO, g::Graph) = begin
+Base.show(io::IO, g::Graph) = begin
     println(io, "G(V,E) = [$(order(g)),$(size(g))]")
     for i = 1:size(g)
         if size(g) <= 50 || i <= 10 || i > (size(g)-10)

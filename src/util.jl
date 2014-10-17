@@ -1,3 +1,5 @@
+cost(g::Graph) =  sum([e.flow * e.cost for e in g.edges])
+
 function st(g::Graph)
     s = nothing
     t = nothing
