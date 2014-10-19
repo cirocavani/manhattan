@@ -26,9 +26,7 @@ end
 function testmaxflow8()
     println("Testing maxflow, big8 graph")
     g = netg("data/big8.net")
-    makest!(g)
-    maxflow!(g)
-    resetst!(g)
+    @time maxflow_castst!(g)
     isfeasibleflow(g) || error("maxflow fail!")    
     g
 end
@@ -41,9 +39,7 @@ function testmaxflowdata()
         path = "data/$f"
         print("Processing $path... ")
         g = netg(path)
-        makest!(g)
-        maxflow!(g)
-        resetst!(g)
+        @time maxflow_castst!(g)
         if isfeasibleflow(g)
             println("PASS")
         else
@@ -106,8 +102,10 @@ end
 function testmincost_cyclecanceling6()
     println("Testing mincost cycle-canceling, stndrd6 graph")
     g = netg("data/stndrd6.net")
-    maxflow_castst!(g)
-    mincost_cyclecanceling!(g)
+    @time begin
+        maxflow_castst!(g)
+        mincost_cyclecanceling!(g)
+    end
     isfeasibleflow(g) || error("mincost cycle-canceling fail!")
     cost(g)
 end
@@ -122,12 +120,14 @@ function testmincostdata_cyclecanceling()
         path = "data/$f"
         print("Processing $path... ")
         g = netg(path)
-        maxflow_castst!(g)
-        mincost_cyclecanceling!(g)
-        if isfeasibleflow(g)
-            println("PASS (cost=$(cost(g)))")
-        else
-            println("FAIL")
+        @time begin
+            maxflow_castst!(g)
+            mincost_cyclecanceling!(g)
+            if isfeasibleflow(g)
+                println("PASS (cost=$(cost(g)))")
+            else
+                println("FAIL")
+            end
         end
     end
 end

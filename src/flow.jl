@@ -82,6 +82,9 @@ function updateflow!(path::Array{PathNode,1}, delta::Int)
     nothing
 end
 
+# Reference
+# Algorithms Design. Tardos and Kleinberg
+# 7.1 The Maximum-Flow Problem and the Ford-Fulkerson Algorithm, pp. 338-346
 function maxflow!(g::Graph)
     s, t = st(g)
     while true
@@ -102,6 +105,9 @@ function maxflow_castst!(g::Graph)
     g
 end
 
+# Reference
+# Network Flows. Ahuja, Magnanti and Orlin
+# 9.6 Cycle-Canceling algorithm and the integrality property, pp. 317-320
 function mincost_cyclecanceling!(g::Graph)
     isfeasibleflow(g) || error("missing flow")
     while true
