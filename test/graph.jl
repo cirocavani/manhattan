@@ -1,4 +1,4 @@
-for i in ["graph","flow","cycle","util","check","netg"]
+for i in ["graph","path","flow","cycle","util","check","netg"]
     require("src/$i.jl")
 end
 

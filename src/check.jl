@@ -9,6 +9,14 @@ function hasconservation(g::Graph)
     true
 end
 
+function isfeasibleflow(g::Graph)
+    hasconservation(g) || return false
+    for e in g.edges
+        e.flow >= e.low && e.flow <= e.cap || return false
+    end
+    true
+end
+
 function hasnonnegativecapacity(g::Graph)
     for e in g.edges
         e.cap >= 0 || return false
@@ -25,14 +33,6 @@ function issingleedge(g::Graph)
                 end
             end
         end
-    end
-    true
-end
-
-function isfeasibleflow(g::Graph)
-    hasconservation(g) || return false
-    for e in g.edges
-        e.flow >= e.low && e.flow <= e.cap || return false
     end
     true
 end

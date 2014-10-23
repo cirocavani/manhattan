@@ -1,3 +1,5 @@
+# Reference
+# http://elib.zib.de/pub/Packages/mp-testdata/mincost/netg/info
 function netg(file::String)
     open(file) do f
         vertices = nothing

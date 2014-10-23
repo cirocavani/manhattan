@@ -1,37 +1,44 @@
-using DataStructures
+using DataStructures: Queue, enqueue!, dequeue!
 
-type PathNode
-    parent::PathNode
-    length::Int
-    reverse::Bool
-    edge::Edge
-    
-    PathNode(e::Edge,r=false) = (p = new(); (p.length, p.reverse, p.edge) = (0, r, e); p)
-    PathNode(p::PathNode, r::Bool, e::Edge) = new(p, p.length + 1, r, e)
-end
-
-head(p::PathNode) = p.reverse ? p.edge.tail : p.edge.head
-tail(p::PathNode) = p.reverse ? p.edge.head : p.edge.tail
-flow(p::PathNode) = p.reverse ? (p.edge.cap - p.edge.flow) : p.edge.flow
-free(p::PathNode) = p.reverse ? p.edge.flow : (p.edge.cap - p.edge.flow)
-cap(p::PathNode) = p.edge.cap
-cost(p::PathNode) = p.reverse ? -p.edge.cost : p.edge.cost
-
-Base.show(io::IO, p::PathNode) = print(io,"($(tail(p)))-[$(flow(p)),$(cap(p)),$(cost(p))]->($(head(p))), reverse=$(p.reverse)")
-
-path(leaf::PathNode) = begin
-    p = Array(PathNode, leaf.length)
-    i = leaf
-    while isdefined(i, :parent)
-        p[i.length] = PathNode(i.edge, i.reverse) # inverse root distance
-        i = i.parent
+# Reference
+# Algorithms Design. Tardos and Kleinberg
+# 7.1 The Maximum-Flow Problem and the Ford-Fulkerson Algorithm, pp. 338-346
+function maxflow!(g::Graph)
+    s, t = st(g)
+    while true
+        path = residualpath(g, s, t)
+        if path == nothing
+            break
+        end
+        delta = residualflow(path)
+        updateflow!(path, delta)
     end
-    p
+    g
 end
 
-function availableflow(p::Array{PathNode,1})
-    minimum([free(i) for i in p])
+function maxflow_castst!(g::Graph)
+    makest!(g)
+    maxflow!(g)
+    resetst!(g)
+    g
 end
+
+# Reference
+# Network Flows. Ahuja, Magnanti and Orlin
+# 9.6 Cycle-Canceling algorithm and the integrality property, pp. 317-320
+function mincost_cyclecanceling!(g::Graph)
+    isfeasibleflow(g) || error("missing flow")
+    while true
+        cycle = negativecycle(g)
+        if cycle == nothing
+            break
+        end
+        delta = availableflow(cycle)
+        updateflow!(cycle, delta)
+    end
+    g
+end
+
 
 function residualpath(g::Graph, s::Vertex, t::Vertex)
     flow(s) > 0 || return nothing
@@ -70,9 +77,13 @@ function residualpath(g::Graph, s::Vertex, t::Vertex)
     nothing
 end
 
-function residualdelta(p::Array{PathNode,1})
+function residualflow(p::Array{PathNode,1})
     v = tail(p[1])
     min(flow(v), availableflow(p))
+end
+
+function availableflow(p::Array{PathNode,1})
+    minimum([free(i) for i in p])
 end
 
 function updateflow!(path::Array{PathNode,1}, delta::Int)
@@ -80,43 +91,4 @@ function updateflow!(path::Array{PathNode,1}, delta::Int)
         p.edge.flow += p.reverse ? -delta : delta
     end
     nothing
-end
-
-# Reference
-# Algorithms Design. Tardos and Kleinberg
-# 7.1 The Maximum-Flow Problem and the Ford-Fulkerson Algorithm, pp. 338-346
-function maxflow!(g::Graph)
-    s, t = st(g)
-    while true
-        path = residualpath(g, s, t)
-        if path == nothing
-            break
-        end
-        delta = residualdelta(path)
-        updateflow!(path, delta)
-    end
-    g
-end
-
-function maxflow_castst!(g::Graph)
-    makest!(g)
-    maxflow!(g)
-    resetst!(g)
-    g
-end
-
-# Reference
-# Network Flows. Ahuja, Magnanti and Orlin
-# 9.6 Cycle-Canceling algorithm and the integrality property, pp. 317-320
-function mincost_cyclecanceling!(g::Graph)
-    isfeasibleflow(g) || error("missing flow")
-    while true
-        cycle = negativecycle(g)
-        if cycle == nothing
-            break
-        end
-        delta = availableflow(cycle)
-        updateflow!(cycle, delta)
-    end
-    g
 end
