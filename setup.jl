@@ -22,20 +22,28 @@ files = [
          "stndrd8.net",
          "stndrd9.net",
          "stndrd10.net",
-         "trans6.net",
-         "trans7.net",
-         "trans8.net",
-         "trans9.net",
-         "trans10.net",
+         "transp6.net",
+         "transp7.net",
+         "transp8.net",
+         "transp9.net",
+         "transp10.net",
          "big4.net",
          "big5.net",
          "big6.net",
          "big7.net",
          "big8.net",
          ]
-         
+
+blacklist = [ "cap6.net", "transp10.net" ]
+
 for f in readdir("data")
     endswith(f, ".net") && !(f in files) || continue
     println("Removing $f...")
     rm("data/$f")
+end
+
+for f in blacklist
+    isfile("data/$f") || continue
+    println("Quarantining $f...")
+    mv("data/$f", "data/$(f)_")
 end
