@@ -1,3 +1,7 @@
+for i in ["graph","flow","cycle","util","check","netg"]
+    require("src/$i.jl")
+end
+
 function g4()
     s = Vertex(1, flow=30)
     u = Vertex(2)
