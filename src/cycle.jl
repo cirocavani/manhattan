@@ -16,7 +16,7 @@ function negativecycle(g::Graph)
     mark = Array(Bool,n)
     _findcycle(p::Array{PathNode,1}, i::Int) = findcycle(mark,p,i)
 
-    for i=2:n
+    for _=2:n
         for v in g.vertices
             mmin = m[v.id]
             k = nothing #Edge
