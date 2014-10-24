@@ -50,3 +50,7 @@ https://github.com/JuliaLang/IJulia.jl
     ipython notebook --profile julia --no-browser --notebook-dir notebook
     (...)
     http://localhost:8998/
+
+Notebook view:
+
+[01 - Cycle Canceling](http://nbviewer.ipython.org/github/cirocavani/manhattan/blob/master/notebook/01%20-%20Cycle%20Canceling.ipynb)
