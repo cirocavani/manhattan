@@ -15,6 +15,13 @@ Implementation:
 * Successive Shortest Path
 * Successive Shortest Path Capacity Scaling
 
+**Julia**
+
+http://julialang.org/
+
+Julia is a high-level, high-performance dynamic programming language for technical computing,
+with syntax that is familiar to users of other technical computing environments.
+
 **Setup**
 
 Dowloading data.
@@ -34,7 +41,9 @@ Dowloading data.
 
 **Notebook**
 
-(...Coming Soon)
+http://ipython.org/notebook.html
+
+https://github.com/JuliaLang/IJulia.jl
 
     julia -e 'Pkg.add("IJulia")'
     (...)
