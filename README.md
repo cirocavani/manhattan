@@ -41,16 +41,19 @@ Dowloading data.
 
 **Notebook**
 
+(using version 3.0)
+
 http://ipython.org/notebook.html
 
 https://github.com/JuliaLang/IJulia.jl
 
     julia -e 'Pkg.add("IJulia")'
     (...)
-    ipython notebook --profile julia --no-browser --notebook-dir notebook
+    ipython notebook --no-browser --notebook-dir notebook
     (...)
-    http://localhost:8998/
+    http://localhost:8888/
 
 Notebook view:
 
-[01 - Cycle Canceling](http://nbviewer.ipython.org/github/cirocavani/manhattan/blob/master/notebook/01%20-%20Cycle%20Canceling.ipynb)
+[01 - Cycle Canceling](http://nbviewer.ipython.org/github/cirocavani/puc-inf2912-t1/blob/master/notebook/01%20-%20Cycle%20Canceling.ipynb)
+
