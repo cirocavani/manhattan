@@ -1,5 +1,5 @@
 for i in ["graph","path","flow","cycle","util","check","netg"]
-    require("src/$i.jl")
+    include("../src/$i.jl")
 end
 
 function g4()
@@ -119,8 +119,8 @@ function testmincostdata_cyclecanceling()
     folder = "data"
     for f in readdir(folder)
         endswith(f, ".net") || continue
-        !beginswith(f, "big") || continue
-        !beginswith(f, "cap") || continue
+        !startswith(f, "big") || continue
+        !startswith(f, "cap") || continue
         path = "data/$f"
         print("Processing $path... ")
         g = netg(path)

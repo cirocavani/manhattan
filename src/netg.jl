@@ -7,7 +7,7 @@ function netg(file::String)
         k = 0
         
         xint(n::Int, line::String, k::String, v::String) = try
-            int(v)
+            parse(Int, v)
         catch e
             error("$n, $line - $k: $(e.msg)")
         end
@@ -16,9 +16,9 @@ function netg(file::String)
             xint(k::String, v::String) = xint(n, line, k, v)
             xerror(m::String) = error("$n, $line - $m")
             
-            if beginswith(line, 'c')
+            if startswith(line, 'c')
                 continue
-            elseif beginswith(line, 'p')
+            elseif startswith(line, 'p')
                 m = split(line, ' ')
                 length(m) == 4 || xerror("Problem line (4): $(length(m))") 
                 order = xint("Number of vertices", m[3])
@@ -29,14 +29,14 @@ function netg(file::String)
                     vertices[i] = Vertex(i)
                 end
                 edges = Array(Edge, size)
-            elseif beginswith(line, 'n')
+            elseif startswith(line, 'n')
                 m = split(line, ' ')
                 length(m) == 3 || xerror("Vertex line (3): $(length(m))")
                 id = xint("Vertex id", m[2])
                 flow = xint("Vertex flow", m[3])
                 
                 vertices[id].flow = flow
-            elseif beginswith(line, 'a')
+            elseif startswith(line, 'a')
                 k < length(edges) || xerror("Edge extra: $(length(edges))")
                 m = split(line, ' ')
                 length(m) == 6 || xerror("Edge line (6): $(length(m))")
