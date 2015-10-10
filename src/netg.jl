@@ -1,20 +1,20 @@
 # Reference
 # http://elib.zib.de/pub/Packages/mp-testdata/mincost/netg/info
-function netg(file::String)
+function netg(file::AbstractString)
     open(file) do f
         vertices = nothing
         edges = nothing
         k = 0
         
-        xint(n::Int, line::String, k::String, v::String) = try
+        xint(n::Int, line::AbstractString, k::AbstractString, v::AbstractString) = try
             parse(Int, v)
         catch e
             error("$n, $line - $k: $(e.msg)")
         end
     
         for (n, line) in enumerate(eachline(f))
-            xint(k::String, v::String) = xint(n, line, k, v)
-            xerror(m::String) = error("$n, $line - $m")
+            xint(k::AbstractString, v::AbstractString) = xint(n, line, k, v)
+            xerror(m::AbstractString) = error("$n, $line - $m")
             
             if startswith(line, 'c')
                 continue
